@@ -16,11 +16,14 @@ public class AppConfig {
         String bearer = "";
 
         try {
-            URL url = AppConfig.class.getResource("application.properties");
+            URL url = AppConfig.class.getResource("/application.properties");
+
+            System.out.println("URL is: " + url);
 
             if (url != null) {
                 archivo = Paths.get(url.toURI()).toFile();
             } else {
+                System.out.println("url to properties is null");
                 throw new NullPointerException("url to properties is null");
             }
         } catch (URISyntaxException | NullPointerException e) {
@@ -40,8 +43,6 @@ public class AppConfig {
                         if (partes.length == 2) {
 
                             bearer = partes[1].trim();
-
-                            System.out.println("Token de autenticación: " + bearer);
 
                         }
                     }

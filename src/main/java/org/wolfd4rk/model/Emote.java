@@ -1,6 +1,9 @@
 package org.wolfd4rk.model;
 
-public class Emote {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Emote implements Serializable {
 
     public Emote() {
     }
@@ -30,5 +33,23 @@ public class Emote {
         this.urlImagen = urlImagen;
     }
 
+    @Override
+    public String toString() {
+        return "Emote{" +
+                "nombre='" + nombre + '\'' +
+                ", urlImagen='" + urlImagen + '\'' +
+                '}';
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Emote emote = (Emote) o;
+        return nombre.equals(emote.nombre) && urlImagen.equals(emote.urlImagen);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre, urlImagen);
+    }
 }
