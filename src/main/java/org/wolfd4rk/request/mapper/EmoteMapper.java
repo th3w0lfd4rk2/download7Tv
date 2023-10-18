@@ -27,7 +27,7 @@ public class EmoteMapper {
             try {
                 JSONObject item = items.getJSONObject(i);
 
-                return new Emote(item.getString("name"), "https:" + item.getJSONObject("host").getString("url") + "/4x.webp");
+                return new Emote(item.getString("name"), "https:" + item.getJSONObject("host").getString("url") + "/4x.png");
 
             } catch (JSONException e) {
                 System.out.println("Error retrieving emote info");

@@ -2,16 +2,12 @@ package org.wolfd4rk.request;
 
 import okhttp3.*;
 import org.wolfd4rk.config.AppConfig;
-import org.wolfd4rk.model.Emote;
-import org.wolfd4rk.request.mapper.EmoteMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CurlRequest {
+public class DownloadEmotes7TV {
 
-    public CurlRequest(int pageNumber) {
+    public DownloadEmotes7TV(int pageNumber) {
         this.pageNumber = pageNumber;
     }
 
