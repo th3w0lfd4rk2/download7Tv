@@ -7,24 +7,25 @@ import java.io.IOException;
 
 public class CurlRequest {
 
-    private CurlRequest(){
+    private CurlRequest() {
 
     }
 
-    public static ResponseBody makeRequest(String url, Headers headers, RequestBody body){
+    public static Response makeRequest(String url, Headers headers, RequestBody body) {
 
         Request request = buildRequest(url, headers, body).build();
 
-        try(Response response = new OkHttpClient().newCall(request).execute()) {
+        try {
 
-            if (response.isSuccessful()){
+            Response response = new OkHttpClient().newCall(request).execute();
+
+            if (response.isSuccessful()) {
 
                 System.out.println("Response is: " + response);
 
-                return response.body();
+                return response;
 
             }
-
 
         } catch (IOException e) {
 
@@ -44,11 +45,11 @@ public class CurlRequest {
         Request.Builder builder = new Request.Builder()
                 .url(url);
 
-        if (headers != null){
+        if (headers != null) {
             builder.headers(headers);
         }
 
-        if (body != null){
+        if (body != null) {
             builder.post(body);
         }
         return builder;

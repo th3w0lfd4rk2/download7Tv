@@ -1,7 +1,6 @@
 package org.wolfd4rk;
 
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.json.JSONException;
 import org.wolfd4rk.model.Emote;
 import org.wolfd4rk.request.CurlRequest;
@@ -15,24 +14,31 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws JSONException {
 
-        String response = obtainResponse(CurlRequest.makeRequest("https://7tv.io/v3/gql", RequestUtil.createHeaders(), RequestUtil.createBody(1)));
+        for(int i = 1; i <= 10; i++){
 
-        List<Emote> emotes = EmoteMapper.mapJson(response);
+            String response = obtainResponse(CurlRequest.makeRequest("https://7tv.io/v3/gql", RequestUtil.createHeaders(), RequestUtil.createBody(i)));
 
-        DownloadImageUtil downloadImageUtil = new DownloadImageUtil("C:\\Users\\israel\\Documents\\emotes7TV");
+            List<Emote> emotes = EmoteMapper.mapJson(response);
 
-        downloadImageUtil.downloadImages(emotes, "png");
-        downloadImageUtil.downloadImages(emotes, "gif");
+            DownloadImageUtil downloadImageUtil = new DownloadImageUtil("E:\\memes\\emotes7TV");
+
+            downloadImageUtil.downloadImages(emotes, "png");
+            downloadImageUtil.downloadImages(emotes, "gif");
+
+            System.out.println("RUN: " + i);
+
+        }
     }
 
-    private static String obtainResponse(ResponseBody responseBody) {
+    private static String obtainResponse(Response requestResponse) {
 
         String response = "";
 
-        if (responseBody != null) {
+        if (requestResponse != null && requestResponse.body() != null) {
 
-            try {
-                response = responseBody.string();
+            try (requestResponse) {
+                response = requestResponse.body().string();
+                requestResponse.body().close();
             } catch (IOException e) {
                 System.out.println("Error getting response body");
             }

@@ -30,9 +30,11 @@ public class DownloadImageUtil {
 
             emote.setUrlImagen(emote.getUrlImagen().replace("png", extension));
 
-            ResponseBody responseBody = CurlRequest.makeRequest(emote.getUrlImagen(), null,null);
+            Response response = CurlRequest.makeRequest(emote.getUrlImagen(), null, null);
 
-            handleResponse(extension, downloadedEmotes, emote, responseBody);
+            if (response != null ){
+                handleResponse(extension, downloadedEmotes, emote, response.body());
+            }
         }
 
         emotes.removeAll(downloadedEmotes);
@@ -41,46 +43,48 @@ public class DownloadImageUtil {
 
     private void handleResponse(String extension, List<Emote> downloadedEmotes, Emote emote, ResponseBody responseBody) {
 
-            if (responseBody != null) {
+        if (responseBody != null) {
 
-                File directorioDestino = new File(path + "/" + extension + "/" + emote.getNombre());
+            File directoryDestination = new File(path + "/" + extension + "/" + emote.getNombre());
 
-                if (!directorioDestino.exists()) {
-                    directorioDestino.mkdirs();
-                }
-
-                String nombreArchivo = emote.getNombre() + "." + extension;
-
-                File archivoDestino = new File(directorioDestino, nombreArchivo);
-
-                writeFile(downloadedEmotes, emote, responseBody, archivoDestino);
-
+            if (!directoryDestination.exists()) {
+                directoryDestination.mkdirs();
             }
+
+            String fileName = emote.getNombre() + "." + extension;
+
+            File fileDestination = new File(directoryDestination, fileName);
+
+            writeFile(downloadedEmotes, emote, responseBody, fileDestination, extension);
+
+        }
     }
 
-    private void writeFile(List<Emote> downloadedEmotes, Emote emote, ResponseBody response, File archivoDestino) {
+    private void writeFile(List<Emote> downloadedEmotes, Emote emote, ResponseBody response, File fileDestination, String extension) {
 
-        int repeated = getRepeatedTimes(archivoDestino.getName());
+        String fileNameNoExtension = fileDestination.getName().replace("." + extension, "").replace("[<>:\"/\\\\|?*]", "()");
 
-        try (FileOutputStream fos = new FileOutputStream(archivoDestino)) {
+        int repeated = getRepeatedTimes(fileNameNoExtension);
+        File finalDestination = fileDestination;
 
-            if (archivoDestino.exists() && repeated == 0) {
-                writeFile(downloadedEmotes, emote, response, new File(archivoDestino.getParentFile(), archivoDestino.getName() + "_" + (repeated+1)));
-            } else if (archivoDestino.exists()){
-                writeFile(downloadedEmotes, emote, response, new File(archivoDestino.getParentFile(), archivoDestino.getName() + "_" + (repeated+1)));
-            }
+        while (finalDestination.exists()) {
+            repeated++;
+            finalDestination = new File(fileDestination.getParentFile(), setFileName(fileNameNoExtension, repeated, extension));
+        }
 
-            //TODO arreglar esta mierda que no crea bien los emotes
-
+        try (FileOutputStream fos = new FileOutputStream(finalDestination)) {
             fos.write(response.bytes());
-
-            System.out.println("Created emote succesfully: " + emote.getNombre());
-
+            System.out.println("Created emote successfully: " + emote.getNombre());
             downloadedEmotes.add(emote);
-
         } catch (IOException e) {
             System.out.println("Failed to create new emote: " + emote.getNombre());
         }
+    }
+
+    private String setFileName(String fileNameNoExtension, int repeated, String extension) {
+
+        return fileNameNoExtension + "_" + (repeated + 1) + "." + extension;
+
     }
 
     private int getRepeatedTimes(String nombreArchivo) {
