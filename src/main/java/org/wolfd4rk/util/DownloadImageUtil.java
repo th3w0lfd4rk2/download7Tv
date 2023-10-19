@@ -3,7 +3,9 @@ package org.wolfd4rk.util;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.wolfd4rk.model.Emote;
+import org.wolfd4rk.request.CurlRequest;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,20 +30,18 @@ public class DownloadImageUtil {
 
             emote.setUrlImagen(emote.getUrlImagen().replace("png", extension));
 
-            Request request = new Request.Builder().url(emote.getUrlImagen()).build();
+            ResponseBody responseBody = CurlRequest.makeRequest(emote.getUrlImagen(), null,null);
 
-            handleResponse(extension, downloadedEmotes, emote, request);
+            handleResponse(extension, downloadedEmotes, emote, responseBody);
         }
 
         emotes.removeAll(downloadedEmotes);
 
     }
 
-    private void handleResponse(String extension, List<Emote> downloadedEmotes, Emote emote, Request request) {
+    private void handleResponse(String extension, List<Emote> downloadedEmotes, Emote emote, ResponseBody responseBody) {
 
-        try (Response response = new OkHttpClient().newCall(request).execute()) {
-
-            if (response.isSuccessful()) {
+            if (responseBody != null) {
 
                 File directorioDestino = new File(path + "/" + extension + "/" + emote.getNombre());
 
@@ -53,19 +53,12 @@ public class DownloadImageUtil {
 
                 File archivoDestino = new File(directorioDestino, nombreArchivo);
 
-                writeFile(downloadedEmotes, emote, response, archivoDestino);
+                writeFile(downloadedEmotes, emote, responseBody, archivoDestino);
 
             }
-
-        } catch (IOException e) {
-
-            System.out.println("Ha petao en la llamada con estos datos: ");
-
-            System.out.println("Request: " + request);
-        }
     }
 
-    private void writeFile(List<Emote> downloadedEmotes, Emote emote, Response response, File archivoDestino) {
+    private void writeFile(List<Emote> downloadedEmotes, Emote emote, ResponseBody response, File archivoDestino) {
 
         int repeated = getRepeatedTimes(archivoDestino.getName());
 
@@ -79,7 +72,7 @@ public class DownloadImageUtil {
 
             //TODO arreglar esta mierda que no crea bien los emotes
 
-            fos.write(response.body().bytes());
+            fos.write(response.bytes());
 
             System.out.println("Created emote succesfully: " + emote.getNombre());
 

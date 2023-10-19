@@ -1,62 +1,18 @@
-package org.wolfd4rk.request;
+package org.wolfd4rk.util;
 
-import okhttp3.*;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import org.wolfd4rk.config.AppConfig;
 
-import java.io.IOException;
+public class RequestUtil {
 
-public class DownloadEmotes7TV {
+    private RequestUtil(){
 
-    public DownloadEmotes7TV(int pageNumber) {
-        this.pageNumber = pageNumber;
     }
-
     private static final AppConfig appconfig = new AppConfig();
 
-    private final int pageNumber;
-
-    private static final String url = "https://7tv.io/v3/gql";
-
-
-    public String makeRequest(){
-
-        String responseBody  = "";
-
-        RequestBody body = createBody();
-
-        Headers headers = createHeaders();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .headers(headers)
-                .post(body)
-                .build();
-
-        try(Response response = new OkHttpClient().newCall(request).execute()) {
-
-            if (response.isSuccessful()){
-
-                responseBody = response.body() != null ? response.body().string() : "";
-
-                System.out.println("Response is: " + responseBody);
-
-            }
-
-
-        } catch (IOException e) {
-
-            System.out.println("Ha petao en la llamada con estos datos: ");
-
-            System.out.println("Request: " + request);
-            System.out.println("Body: " + body);
-            System.out.println("Headers: " + headers);
-
-        }
-
-        return responseBody;
-    }
-
-    private Headers createHeaders() {
+    public static Headers createHeaders() {
 
         return new Headers.Builder()
                 .add("Accept", "*/*")
@@ -75,7 +31,7 @@ public class DownloadEmotes7TV {
                 .build();
     }
 
-    private RequestBody createBody() {
+    public static RequestBody createBody(int pageNumber) {
 
         StringBuilder body = new StringBuilder("{\"operationName\":\"SearchEmotes\",\"variables\":{\"query\":\"\",\"limit\":45,\"page\":");
 
@@ -93,6 +49,4 @@ public class DownloadEmotes7TV {
 
         return RequestBody.create(body.toString(), JSON);
     }
-
-
 }
